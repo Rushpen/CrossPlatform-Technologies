@@ -1,6 +1,0 @@
-@Gadelshin_Lab1_HostAddress = http://localhost:5120
-
-GET {{Gadelshin_Lab1_HostAddress}}/weatherforecast/
-Accept: application/json
-
-###
