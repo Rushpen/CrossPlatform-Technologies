@@ -1,0 +1,122 @@
+{
+	"info": {
+		"_postman_id": "34bcdb82-e62a-4033-9cb3-3c1fe61d3181",
+		"name": "New Collection",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "40287592"
+	},
+	"item": [
+		{
+			"name": "Get all authors",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{protocol}}://localhost:{{port}}/api/Author/",
+					"protocol": "{{protocol}}",
+					"host": [
+						"localhost"
+					],
+					"port": "{{port}}",
+					"path": [
+						"api",
+						"Author",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create one author",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"id\": 0,\r\n  \"name\": \"Lev\",\r\n  \"dateOfBirth\": \"1824-12-08T22:33:16.786Z\",\r\n  \"biography\": \"...\",\r\n  \"books\": [\r\n    {\r\n      \"id\": 0,\r\n      \"title\": \"War and piece\",\r\n      \"genre\": \"gfgfgfgfg\",\r\n      \"publishedYear\": 1900,\r\n      \"authorId\": 0\r\n    }\r\n  ]\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{protocol}}://localhost:{{port}}/api/Author",
+					"protocol": "{{protocol}}",
+					"host": [
+						"localhost"
+					],
+					"port": "{{port}}",
+					"path": [
+						"api",
+						"Author"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get books",
+			"request": {
+				"method": "GET",
+				"header": []
+			},
+			"response": []
+		},
+		{
+			"name": "Add author",
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"url": {
+					"raw": "{{protocol}}://localhost:{{port}}/api/Author",
+					"protocol": "{{protocol}}",
+					"host": [
+						"localhost"
+					],
+					"port": "{{port}}",
+					"path": [
+						"api",
+						"Author"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "protocol",
+			"value": "https",
+			"type": "string"
+		},
+		{
+			"key": "port",
+			"value": "7002",
+			"type": "string"
+		}
+	]
+}
