@@ -12,7 +12,7 @@
         // Methods
         public bool IsAvailable()
         {
-            return true; // Пример, нужно добавить реальную логику
+            return true;
         }
 
         public string GetShortDescription()
