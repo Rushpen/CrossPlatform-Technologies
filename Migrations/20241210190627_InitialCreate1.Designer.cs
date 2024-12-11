@@ -3,6 +3,7 @@ using System;
 using Gadelshin_Lab1.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Gadelshin_Lab1.Migrations
 {
     [DbContext(typeof(Gadelshin_Lab1Context))]
-    partial class Gadelshin_Lab1ContextModelSnapshot : ModelSnapshot
+    [Migration("20241210190627_InitialCreate1")]
+    partial class InitialCreate1
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -34,8 +37,8 @@ namespace Gadelshin_Lab1.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<DateOnly>("DateOfBirth")
-                        .HasColumnType("date");
+                    b.Property<DateTime>("DateOfBirth")
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -111,13 +114,11 @@ namespace Gadelshin_Lab1.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Gadelshin_Lab1.Models.User", "User")
+                    b.HasOne("Gadelshin_Lab1.Models.User", null)
                         .WithMany("BorrowedBooks")
                         .HasForeignKey("UserId");
 
                     b.Navigation("Author");
-
-                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("Gadelshin_Lab1.Models.Author", b =>

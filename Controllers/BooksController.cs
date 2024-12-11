@@ -18,39 +18,93 @@ namespace Gadelshin_Lab1.Controllers
             _context = context;
         }
 
-        // GET: api/Books
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Book>>> GetBook()
+        public async Task<ActionResult<IEnumerable<object>>> GetBook()
         {
-            return await _context.Book.ToListAsync();
+            var books = await _context.Book
+                .Select(b => new
+                {
+                    Id = b.Id,
+                    Title = b.Title,
+                    Genre = b.Genre,
+                    PublishedYear = b.PublishedYear,
+                    AuthorName = b.Author != null ? b.Author.Name : "Unknown",
+                    isBorrow = b.User != null ? "Yes" : "No"
+                }
+                )
+                .ToListAsync();
+
+            return Ok(books);
         }
 
-        // GET: /api/books/available
-        [HttpGet("available")]
-        public async Task<ActionResult<IEnumerable<Book>>> GetAvailableBooks()
+        // GET: /api/books/filter?isModern=true
+        [HttpGet("filter")]
+        public async Task<ActionResult<IEnumerable<Book>>> GetFilteredBooks([FromQuery] bool? isModern)
         {
-            return await _context.Book.Where(b => b.IsAvailable()).ToListAsync();
+            var books = await _context.Book.ToListAsync();
+
+            if (isModern.HasValue)
+            {
+                if (isModern.Value)
+                {
+                    books = books.Where(b => b.IsModern()).ToList();
+                }
+                else
+                {
+                    books = books.Where(b => b.IsClassic()).ToList();
+                }
+            }
+            if (!books.Any())
+            {
+                return NotFound("No books match the specified criteria.");
+            }
+            return Ok(books);
         }
 
-        // GET: /api/books/by-author/{authorId}
-        [HttpGet("by-author/{authorId}")]
-        public async Task<ActionResult<IEnumerable<Book>>> GetBooksByAuthor(int authorId)
+        [HttpGet("by-author/{id}")]
+        public async Task<ActionResult<IEnumerable<Book>>> GetBooksByAuthor(int id)
         {
-            return await _context.Book.Where(b => b.AuthorId == authorId).ToListAsync();
+            var books = await _context.Book
+                .Where(b => b.AuthorId == id)
+                .Select(b => new
+                {
+                    Id = b.Id,
+                    Title = b.Title,
+                    Genre = b.Genre,
+                    PublishedYear = b.PublishedYear
+                }
+                ).ToListAsync();
+
+            if (books == null || books.Count == 0)
+            {
+                return NotFound($"Books by author '{id}' not found.");
+            }
+
+            return Ok(books);
         }
 
         // GET: api/Books/5
         [HttpGet("{id}")]
         public async Task<ActionResult<Book>> GetBook(int id)
         {
-            var book = await _context.Book.FindAsync(id);
+            var book = await _context.Book
+                .Where(b=>b.Id == id)
+                .Select(b => new
+                {
+                    Id = b.Id,
+                    Title = b.Title,
+                    Genre = b.Genre,
+                    PublishedYear = b.PublishedYear,
+                    AuthorName = b.Author != null ? b.Author.Name : "Unknown"
+                }
+                ).ToListAsync();
 
             if (book == null)
             {
                 return NotFound();
             }
 
-            return book;
+            return Ok(book);
         }
 
         // POST: api/Books

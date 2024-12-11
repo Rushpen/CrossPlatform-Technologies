@@ -1,4 +1,5 @@
-﻿namespace Gadelshin_Lab1.Models
+﻿using System.Text.Json.Serialization;
+namespace Gadelshin_Lab1.Models
 {
     public class Book
     {
@@ -7,17 +8,29 @@
         public string? Genre { get; set; }
         public int PublishedYear { get; set; }
         public int AuthorId { get; set; }
-        virtual public Author Author { get; set; }
+        public int? UserId { get; set; }
+
+        [JsonIgnore]
+        public Author? Author { get; set; }
+        [JsonIgnore]
+        public User? User { get; set; }
 
         // Methods
-        public bool IsAvailable()
+        public int GetBookAge()
         {
-            return true;
+            return DateTime.Now.Year - PublishedYear;
         }
-
+        public bool IsClassic()
+        {
+            return GetBookAge() > 50;
+        }
+        public bool IsModern()
+        {
+            return GetBookAge() <= 10;
+        }
         public string GetShortDescription()
         {
-            return $"{Title} ({PublishedYear}) - {Genre}";
+            return $"{Title} ({PublishedYear}) - {Genre}, Author: {AuthorId}";
         }
     }
 }

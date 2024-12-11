@@ -25,48 +25,50 @@ namespace Gadelshin_Lab1.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Author>>> GetAuthor()
         {
-            return await _context.Author.ToListAsync();
+            return await _context.Author
+                .Include(a => a.Books)
+                .ToListAsync();
         }
 
         // GET: api/Authors/5
         [HttpGet("{id}")]
         public async Task<ActionResult<Author>> GetAuthor(int id)
         {
-            var author = await _context.Author.FindAsync(id);
+            var author = await _context.Author
+                .Where(a => a.Id == id)
+                .Select(a => new
+                {
+                    Id = a.Id,
+                    Title = a.Name,
+                    Genre = a.Biography,
+                    PublishedYear = a.DateOfBirth,
+                    Biography = a.Biography,
+                    Books = a.Books.Select(b => b.Title).ToList()
+                }
+                ).ToListAsync();
 
             if (author == null)
             {
                 return NotFound();
             }
 
-            return author;
+            return Ok(author);
         }
 
-        // GET: /api/authors/{id}/details
+        // GET: api/Authors/{id}/details
         [HttpGet("{id}/details")]
         public async Task<IActionResult> GetAuthorDetails(int id)
         {
-            var author = await _context.Author.FindAsync(id);
-            if (author == null)
-            {
-                return NotFound();
-            }
-            return Ok(author.GetFullInfo());
-        }
-
-        // GET: /api/authors/most-books
-        [HttpGet("most-books")]
-        public async Task<IActionResult> GetAuthorWithMostBooks()
-        {
             var author = await _context.Author
-                .OrderByDescending(a => a.GetBookCount())
-                .FirstOrDefaultAsync();
+                .Include(a => a.Books)
+                .FirstOrDefaultAsync(a => a.Id == id);
 
             if (author == null)
             {
                 return NotFound();
             }
-            return Ok(author);
+
+            return Ok(author.GetFullInfo());
         }
 
         // POST: api/Authors

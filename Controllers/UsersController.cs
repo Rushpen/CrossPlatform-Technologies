@@ -25,7 +25,18 @@ namespace Gadelshin_Lab1.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<User>>> GetUser()
         {
-            return await _context.User.ToListAsync();
+            var Users = await _context.User
+                .Include(u => u.BorrowedBooks)
+                .Select(u => new
+                {
+                    Id = u.Id,
+                    Login = u.Login,
+                    Role = u.Role,
+                    Books = u.BorrowedBooks.Select(b => b.Title).ToList()
+                }
+                )
+                .ToListAsync();
+            return Ok(Users);
         }
 
         // GET: api/Users/5

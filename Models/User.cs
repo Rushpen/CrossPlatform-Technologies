@@ -7,7 +7,9 @@ namespace Gadelshin_Lab1.Models
     {
         public int Id { get; set; }
         public string Login { get; set; }
-        public string Role { get; set; } // Admin, Reader
+        public string Role { get; set; } // admin, reader
+        public List<Book> BorrowedBooks { get; set; }
+
         private byte[] password;
         public string Password
         {
@@ -21,8 +23,6 @@ namespace Gadelshin_Lab1.Models
             set { password = Encoding.UTF8.GetBytes(value); }
         }
 
-        virtual public List<Book> BorrowedBooks { get; set; }
-
         public User()
         {
             BorrowedBooks = new List<Book>();
@@ -34,13 +34,14 @@ namespace Gadelshin_Lab1.Models
 
         public bool CanBorrowBooks()
         {
-            return Role == "Reader";
+            return Role == "reader";
         }
 
         public void BorrowBook(Book book)
         {
             if (CanBorrowBooks())
             {
+                book.UserId = this.Id;
                 BorrowedBooks.Add(book);
             }
         }
