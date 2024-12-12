@@ -28,7 +28,7 @@ namespace Gadelshin_Lab1.Controllers
                     Title = b.Title,
                     Genre = b.Genre,
                     PublishedYear = b.PublishedYear,
-                    AuthorName = b.Author != null ? b.Author.Name : "Unknown",
+                    Authors = b.Authors.Select(b => b.Name).ToList(),
                     isBorrow = b.User != null ? "Yes" : "No"
                 }
                 )
@@ -37,35 +37,42 @@ namespace Gadelshin_Lab1.Controllers
             return Ok(books);
         }
 
-        // GET: /api/books/filter?isModern=true
+        // GET: /api/books/filter?isModern
         [HttpGet("filter")]
-        public async Task<ActionResult<IEnumerable<Book>>> GetFilteredBooks([FromQuery] bool? isModern)
+        public async Task<ActionResult<IEnumerable<Book>>> GetFilteredBooks([FromQuery] string? bookType)
         {
-            var books = await _context.Book.ToListAsync();
+            var books = await _context.Book
+                .Include(b => b.Authors)
+                .Include(b => b.User)
+                .ToListAsync();
 
-            if (isModern.HasValue)
+            if (!string.IsNullOrEmpty(bookType))
             {
-                if (isModern.Value)
-                {
-                    books = books.Where(b => b.IsModern()).ToList();
-                }
-                else
-                {
-                    books = books.Where(b => b.IsClassic()).ToList();
-                }
+                books = books.Where(b => b.GetBookType().ToString().Equals(bookType, StringComparison.OrdinalIgnoreCase)).ToList();
             }
-            if (!books.Any())
+            var result = books.Select(b => new
+            {
+                Id = b.Id,
+                Title = b.Title,
+                Genre = b.Genre,
+                PublishedYear = b.PublishedYear,
+                Authors = b.Authors.Select(a => a.Name).ToList(),
+                isBorrow = b.User != null ? "Yes" : "No"
+            }).ToList();
+
+            if (!result.Any())
             {
                 return NotFound("No books match the specified criteria.");
             }
-            return Ok(books);
+
+            return Ok(result);
         }
 
         [HttpGet("by-author/{id}")]
         public async Task<ActionResult<IEnumerable<Book>>> GetBooksByAuthor(int id)
         {
             var books = await _context.Book
-                .Where(b => b.AuthorId == id)
+                .Where(b => b.Authors.Any(a => a.Id == id))
                 .Select(b => new
                 {
                     Id = b.Id,
@@ -95,7 +102,7 @@ namespace Gadelshin_Lab1.Controllers
                     Title = b.Title,
                     Genre = b.Genre,
                     PublishedYear = b.PublishedYear,
-                    AuthorName = b.Author != null ? b.Author.Name : "Unknown"
+                    Authors = b.Authors.Select(b => b.Name).ToList(),
                 }
                 ).ToListAsync();
 
@@ -109,12 +116,60 @@ namespace Gadelshin_Lab1.Controllers
 
         // POST: api/Books
         [HttpPost]
-        public async Task<ActionResult<Book>> PostBook(Book book)
+        public async Task<ActionResult<Book>> PostBook([FromBody] Book bookInput)
         {
-            _context.Book.Add(book);
+            if (bookInput == null || string.IsNullOrEmpty(bookInput.Title) ||
+                string.IsNullOrEmpty(bookInput.Genre) || bookInput.PublishedYear <= 0)
+            {
+                return BadRequest("Invalid book data. Please provide Title, Genre, and Published Year.");
+            }
+            var newBook = new Book
+            {
+                Title = bookInput.Title,
+                Genre = bookInput.Genre,
+                PublishedYear = bookInput.PublishedYear,
+                Authors = new List<Author>()
+            };
+
+            _context.Book.Add(newBook);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetBook", new { id = book.Id }, book);
+            return CreatedAtAction(nameof(GetBook), new { id = newBook.Id }, newBook);
+        }
+
+        // POST: api/Books/id/add-authors
+        [HttpPost("{id}/add-authors")]
+        public async Task<IActionResult> AddAuthorsToBook(int id, [FromBody] List<int> authorIds)
+        {
+            var book = await _context.Book
+                .Include(b => b.Authors)
+                .FirstOrDefaultAsync(b => b.Id == id);
+
+            if (book == null)
+            {
+                return NotFound($"Book with ID {id} not found.");
+            }
+
+            var authors = await _context.Author
+                .Where(a => authorIds.Contains(a.Id))
+                .ToListAsync();
+
+            if (authors == null || authors.Count == 0)
+            {
+                return NotFound("No valid authors found with the provided IDs.");
+            }
+
+            foreach (var author in authors)
+            {
+                if (!book.Authors.Contains(author))
+                {
+                    book.Authors.Add(author);
+                }
+            }
+
+            await _context.SaveChangesAsync();
+
+            return Ok($"Authors successfully added to the book with ID {id}.");
         }
 
         // PUT: /api/books/{id}
@@ -145,6 +200,32 @@ namespace Gadelshin_Lab1.Controllers
             }
             return NoContent();
         }
+
+        [HttpPut("{id}/update-authors")]
+        public async Task<IActionResult> UpdateAuthorsForBook(int id, [FromBody] List<int> authorIds)
+        {
+            var book = await _context.Book
+                .Include(b => b.Authors)
+                .FirstOrDefaultAsync(b => b.Id == id);
+
+            if (book == null)
+                return NotFound($"Book with ID {id} not found.");
+
+            var authors = await _context.Author
+                .Where(a => authorIds.Contains(a.Id))
+                .ToListAsync();
+
+            if (authors == null || authors.Count == 0)
+                return NotFound("No valid authors found with the provided IDs.");
+
+            book.Authors.Clear();
+            book.Authors.AddRange(authors);
+
+            await _context.SaveChangesAsync();
+
+            return Ok($"Authors for the book with ID {id} were successfully updated.");
+        }
+
 
         // DELETE: api/Books/5
         [HttpDelete("{id}")]

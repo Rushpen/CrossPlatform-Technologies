@@ -7,30 +7,35 @@ namespace Gadelshin_Lab1.Models
         public string? Title { get; set; }
         public string? Genre { get; set; }
         public int PublishedYear { get; set; }
-        public int AuthorId { get; set; }
         public int? UserId { get; set; }
 
         [JsonIgnore]
-        public Author? Author { get; set; }
+        public List<Author>? Authors { get; set; }
         [JsonIgnore]
         public User? User { get; set; }
+
+        public enum BookType { Modern, Classic, Other}
 
         // Methods
         public int GetBookAge()
         {
             return DateTime.Now.Year - PublishedYear;
         }
-        public bool IsClassic()
+        public BookType GetBookType()
         {
-            return GetBookAge() > 50;
+            int bookAge = GetBookAge();
+
+            if (bookAge <= 10)
+                return BookType.Modern; 
+            else if (bookAge > 50)
+                return BookType.Classic;
+            else
+                return BookType.Other;
         }
-        public bool IsModern()
-        {
-            return GetBookAge() <= 10;
-        }
+
         public string GetShortDescription()
         {
-            return $"{Title} ({PublishedYear}) - {Genre}, Author: {AuthorId}";
+            return $"{Title} ({PublishedYear}) - {Genre}";
         }
     }
 }
