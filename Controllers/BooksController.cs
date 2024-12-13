@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Gadelshin_Lab1.Data;
 using Gadelshin_Lab1.Models;
 using static System.Reflection.Metadata.BlobBuilder;
+using Gadelshin_Lab1.Managers;
 
 namespace Gadelshin_Lab1.Controllers
 {
@@ -12,28 +13,18 @@ namespace Gadelshin_Lab1.Controllers
     public class BooksController : ControllerBase
     {
         private readonly Gadelshin_Lab1Context _context;
+        private readonly BookManager _bookManager;
 
         public BooksController(Gadelshin_Lab1Context context)
         {
             _context = context;
+            _bookManager = new BookManager(context);
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<object>>> GetBook()
+        public async Task<ActionResult<IEnumerable<Book>>> GetBook()
         {
-            var books = await _context.Book
-                .Select(b => new
-                {
-                    Id = b.Id,
-                    Title = b.Title,
-                    Genre = b.Genre,
-                    PublishedYear = b.PublishedYear,
-                    Authors = b.Authors.Select(b => b.Name).ToList(),
-                    isBorrow = b.User != null ? "Yes" : "No"
-                }
-                )
-                .ToListAsync();
-
+            var books = await _bookManager.GetBook();
             return Ok(books);
         }
 
@@ -41,46 +32,25 @@ namespace Gadelshin_Lab1.Controllers
         [HttpGet("filter")]
         public async Task<ActionResult<IEnumerable<Book>>> GetFilteredBooks([FromQuery] string? bookType)
         {
-            var books = await _context.Book
-                .Include(b => b.Authors)
-                .Include(b => b.User)
-                .ToListAsync();
-
-            if (!string.IsNullOrEmpty(bookType))
+            try
             {
-                books = books.Where(b => b.GetBookType().ToString().Equals(bookType, StringComparison.OrdinalIgnoreCase)).ToList();
+                var books = await _bookManager.GetFilteredBooks(bookType);
+
+                if (!books.Any())
+                    return NotFound("No books match the specified criteria.");
+
+                return Ok(books);
             }
-            var result = books.Select(b => new
+            catch (Exception ex)
             {
-                Id = b.Id,
-                Title = b.Title,
-                Genre = b.Genre,
-                PublishedYear = b.PublishedYear,
-                Authors = b.Authors.Select(a => a.Name).ToList(),
-                isBorrow = b.User != null ? "Yes" : "No"
-            }).ToList();
-
-            if (!result.Any())
-            {
-                return NotFound("No books match the specified criteria.");
+                return BadRequest($"An error occurred: {ex.Message}");
             }
-
-            return Ok(result);
         }
 
         [HttpGet("by-author/{id}")]
         public async Task<ActionResult<IEnumerable<Book>>> GetBooksByAuthor(int id)
         {
-            var books = await _context.Book
-                .Where(b => b.Authors.Any(a => a.Id == id))
-                .Select(b => new
-                {
-                    Id = b.Id,
-                    Title = b.Title,
-                    Genre = b.Genre,
-                    PublishedYear = b.PublishedYear
-                }
-                ).ToListAsync();
+            var books = await _bookManager.GetBooksByAuthor(id);
 
             if (books == null || books.Count == 0)
             {
@@ -94,23 +64,9 @@ namespace Gadelshin_Lab1.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<Book>> GetBook(int id)
         {
-            var book = await _context.Book
-                .Where(b=>b.Id == id)
-                .Select(b => new
-                {
-                    Id = b.Id,
-                    Title = b.Title,
-                    Genre = b.Genre,
-                    PublishedYear = b.PublishedYear,
-                    Authors = b.Authors.Select(b => b.Name).ToList(),
-                }
-                ).ToListAsync();
-
+            var book = await _bookManager.GetBook(id);
             if (book == null)
-            {
                 return NotFound();
-            }
-
             return Ok(book);
         }
 
@@ -118,22 +74,8 @@ namespace Gadelshin_Lab1.Controllers
         [HttpPost]
         public async Task<ActionResult<Book>> PostBook([FromBody] Book bookInput)
         {
-            if (bookInput == null || string.IsNullOrEmpty(bookInput.Title) ||
-                string.IsNullOrEmpty(bookInput.Genre) || bookInput.PublishedYear <= 0)
-            {
-                return BadRequest("Invalid book data. Please provide Title, Genre, and Published Year.");
-            }
-            var newBook = new Book
-            {
-                Title = bookInput.Title,
-                Genre = bookInput.Genre,
-                PublishedYear = bookInput.PublishedYear,
-                Authors = new List<Author>()
-            };
-
+            var newBook = await _bookManager.PostBook(bookInput);
             _context.Book.Add(newBook);
-            await _context.SaveChangesAsync();
-
             return CreatedAtAction(nameof(GetBook), new { id = newBook.Id }, newBook);
         }
 
@@ -141,89 +83,45 @@ namespace Gadelshin_Lab1.Controllers
         [HttpPost("{id}/add-authors")]
         public async Task<IActionResult> AddAuthorsToBook(int id, [FromBody] List<int> authorIds)
         {
-            var book = await _context.Book
-                .Include(b => b.Authors)
-                .FirstOrDefaultAsync(b => b.Id == id);
-
-            if (book == null)
+            try
             {
-                return NotFound($"Book with ID {id} not found.");
+                var message = await _bookManager.AddAuthorsToBook(id, authorIds);
+                return Ok(message);
             }
-
-            var authors = await _context.Author
-                .Where(a => authorIds.Contains(a.Id))
-                .ToListAsync();
-
-            if (authors == null || authors.Count == 0)
+            catch (Exception e)
             {
-                return NotFound("No valid authors found with the provided IDs.");
+                return BadRequest(e.Message);
             }
-
-            foreach (var author in authors)
-            {
-                if (!book.Authors.Contains(author))
-                {
-                    book.Authors.Add(author);
-                }
-            }
-
-            await _context.SaveChangesAsync();
-
-            return Ok($"Authors successfully added to the book with ID {id}.");
         }
 
         // PUT: /api/books/{id}
         [HttpPut("{id}")]
         public async Task<IActionResult> PutBook(int id, Book book)
         {
-            if (id != book.Id)
-            {
-                return BadRequest();
-            }
-
-            _context.Entry(book).State = EntityState.Modified;
-
             try
             {
-                await _context.SaveChangesAsync();
+                await _bookManager.UpdateBook(id, book);
+                return Ok($"Book with ID {id} was updated");
             }
-            catch (DbUpdateConcurrencyException)
+            catch (Exception e)
             {
-                if (!BookExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
+                return BadRequest(e.Message);
             }
-            return NoContent();
         }
 
         [HttpPut("{id}/update-authors")]
         public async Task<IActionResult> UpdateAuthorsForBook(int id, [FromBody] List<int> authorIds)
         {
-            var book = await _context.Book
-                .Include(b => b.Authors)
-                .FirstOrDefaultAsync(b => b.Id == id);
+            try
+            {
+                await _bookManager.UpdateAuthorsForBook(id, authorIds);
+                return Ok($"Author updated for book with ID {id}.");
+            }
 
-            if (book == null)
-                return NotFound($"Book with ID {id} not found.");
-
-            var authors = await _context.Author
-                .Where(a => authorIds.Contains(a.Id))
-                .ToListAsync();
-
-            if (authors == null || authors.Count == 0)
-                return NotFound("No valid authors found with the provided IDs.");
-
-            book.Authors.Clear();
-            book.Authors.AddRange(authors);
-
-            await _context.SaveChangesAsync();
-
-            return Ok($"Authors for the book with ID {id} were successfully updated.");
+            catch (Exception e)
+            {
+                return BadRequest(e.Message);
+            }
         }
 
 
@@ -231,21 +129,17 @@ namespace Gadelshin_Lab1.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteBook(int id)
         {
-            var book = await _context.Book.FindAsync(id);
-            if (book == null)
+            try
             {
-                return NotFound();
+                await _bookManager.DeleteBook(id);
+                return Ok($"Book deleted with ID {id}.");
             }
 
-            _context.Book.Remove(book);
-            await _context.SaveChangesAsync();
-
-            return NoContent();
+            catch (Exception e)
+            {
+                return BadRequest(e.Message);
+            }
         }
 
-        private bool BookExists(int id)
-        {
-            return _context.Book.Any(e => e.Id == id);
-        }
     }
 }

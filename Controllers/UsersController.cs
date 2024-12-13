@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Gadelshin_Lab1.Data;
 using Gadelshin_Lab1.Models;
+using Gadelshin_Lab1.Managers;
 
 namespace Gadelshin_Lab1.Controllers
 {
@@ -15,27 +16,19 @@ namespace Gadelshin_Lab1.Controllers
     public class UsersController : ControllerBase
     {
         private readonly Gadelshin_Lab1Context _context;
+        private readonly UserManager _userManager;
 
         public UsersController(Gadelshin_Lab1Context context)
         {
             _context = context;
+            _userManager = new UserManager(context);
         }
 
         // GET: api/Users
         [HttpGet]
         public async Task<ActionResult<IEnumerable<User>>> GetUser()
         {
-            var user = await _context.User
-                .Include(u => u.BorrowedBooks)
-                .Select(u => new
-                {
-                    Id = u.Id,
-                    Login = u.Login,
-                    Role = u.Role,
-                    Books = u.BorrowedBooks.Select(b => b.Title).ToList()
-                }
-                )
-                .ToListAsync();
+            var user = await _userManager.GetUser();
             return Ok(user);
         }
 
@@ -43,19 +36,9 @@ namespace Gadelshin_Lab1.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<User>> GetUser(int id)
         {
-            var user = await _context.User
-                .Include(u => u.BorrowedBooks)
-                .Select(u => new
-                {
-                    Id = u.Id,
-                    Login = u.Login,
-                    Role = u.Role,
-                    Books = u.BorrowedBooks.Select(b => b.Title).ToList()
-                }
-                )
-                .FirstOrDefaultAsync(u => u.Id == id);
-
-            await _context.SaveChangesAsync();
+            var user = await _userManager.GetUser(id);
+            if (user == null)
+                return NotFound();
             return Ok(user);
         }
 
@@ -63,145 +46,86 @@ namespace Gadelshin_Lab1.Controllers
         [HttpGet("{id}/borrowed-books")]
         public async Task<IActionResult> GetBorrowedBooks(int id)
         {
-            var user = await _context.User
-                .Where(u => u.Id == id)
-                .Include(u => u.BorrowedBooks)
-                .Select(u => new { Books = u.BorrowedBooks.Select(b => b.Title).ToList() }
-                ).FirstOrDefaultAsync();
-
-            await _context.SaveChangesAsync();
+            var user = await _userManager.GetBorrowedBooks(id);
+            if (user == null)
+                return NotFound();
             return Ok(user);
         }
 
         // PUT: api/Users/5
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutUser(int id, User user)
+        public async Task<IActionResult> UpdateUser(int id, User user)
         {
-            if (id != user.Id)
-            {
-                return BadRequest("Invalid User id. Please check that this {id} is exists");
-            }
-
-            _context.Entry(user).State = EntityState.Modified;
-
             try
             {
-                await _context.SaveChangesAsync();
+                await _userManager.UpdateUser(id, user);
+                return Ok($"User with ID {id} was updated");
             }
-            catch (DbUpdateConcurrencyException)
+            catch (Exception e)
             {
-                if (!UserExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
+                return BadRequest(e.Message);
             }
-            return NoContent();
         }
 
         // POST: api/Users/{id}/add-books
         [HttpPost("{id}/add-books")]
         public async Task<IActionResult> AddUserBooks(int id, [FromBody] List<int> bookIds)
         {
-            var user = await _context.User
-                .Include(u => u.BorrowedBooks)
-                .FirstOrDefaultAsync(u => u.Id == id);
-
-            if (user == null)
+            try
             {
-                return NotFound($"User with ID {id} not found.");
+                var message = await _userManager.AddUserBooks(id, bookIds);
+                return Ok(message);
             }
 
-            var books = await _context.Book
-                .Where(b => bookIds.Contains(b.Id))
-                .ToListAsync();
-
-            if (books == null || books.Count == 0)
+            catch (Exception e)
             {
-                return NotFound("No valid books found with the provided IDs.");
+                return BadRequest(e.Message);
             }
-
-            foreach (var book in books)
-            {
-                if (!user.BorrowedBooks.Contains(book))
-                {
-                    user.BorrowedBooks.Add(book);
-                    book.UserId = user.Id;
-                }
-            }
-            await _context.SaveChangesAsync();
-
-            return Ok($"Books successfully added to user with ID {id}.");
         }
 
         // PUT: api/Users/{id}/update-books
         [HttpPut("{id}/update-books")]
         public async Task<IActionResult> UpdateUserBooks(int id, [FromBody] List<int> bookIds)
         {
-            var user = await _context.User
-                .Include(u => u.BorrowedBooks)
-                .FirstOrDefaultAsync(u => u.Id == id);
-
-            if (user == null)
+            try
             {
-                return NotFound($"User with ID {id} not found.");
+                await _userManager.UpdateUserBooks(id, bookIds);
+                return Ok($"Borrowed books updated for user with ID {id}.");
             }
-
-            var books = await _context.Book
-                .Where(b => bookIds.Contains(b.Id))
-                .ToListAsync();
-
-            user.BorrowedBooks.Clear();
-            user.BorrowedBooks.AddRange(books);
-            await _context.SaveChangesAsync();
-
-            return Ok($"Books successfully updated to user with ID {id}.");
+            catch (Exception e) 
+            { 
+                return BadRequest(e.Message);
+            }
         }
 
         // POST: api/Users
         [HttpPost]
-        public async Task<ActionResult<User>> PostUser([FromBody] User user)
+        public async Task<ActionResult<User>> AddUser([FromBody] User user)
         {
-            if(user == null || string.IsNullOrEmpty(user.Login) ||
-                string.IsNullOrEmpty(user.Role) || string.IsNullOrEmpty(user.Password))
+            try
             {
-                return BadRequest("Invalid User data. Please provide Login, Rol, and Password.");
+                var message = await _userManager.AddUser(user);
+                return Ok(message);
             }
-            var newUser = new User
-            {
-                Login = user.Login,
-                Role = user.Role,
-                Password = user.Password,
-                BorrowedBooks = new List<Book>()
-            };
-            _context.User.Add(user);
-            await _context.SaveChangesAsync();
-
-            return CreatedAtAction("GetUser", new { id = user.Id }, user);
+            catch (Exception e) {
+                return BadRequest(e.Message);
+            }
         }
 
         // DELETE: api/Users/5
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteUser(int id)
         {
-            var user = await _context.User.FindAsync(id);
-            if (user == null)
+            try
             {
-                return NotFound();
+                await _userManager.DeleteUser(id);
+                return Ok($"Book deleted with ID {id}.");
             }
 
-            _context.User.Remove(user);
-            await _context.SaveChangesAsync();
-
-            return NoContent();
-        }
-
-        private bool UserExists(int id)
-        {
-            return _context.User.Any(e => e.Id == id);
+            catch (Exception e)
+            {
+                return BadRequest(e.Message);
+            }
         }
     }
 }
