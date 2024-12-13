@@ -87,6 +87,7 @@ namespace Gadelshin_Lab1.Controllers
         {
             try
             {
+                author.Id = id;
                 await _authorManager.UpdateAuthor(id, author);
                 return NoContent();
             }

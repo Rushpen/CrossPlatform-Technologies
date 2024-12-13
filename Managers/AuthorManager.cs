@@ -18,9 +18,8 @@ namespace Gadelshin_Lab1.Managers
                 .Select(a => new
                 {
                     Id = a.Id,
-                    Title = a.Name,
-                    Genre = a.Biography,
-                    PublishedYear = a.DateOfBirth,
+                    Name = a.Name,
+                    DateOfBirth = a.DateOfBirth,
                     Biography = a.Biography,
                     Books = a.Books.Select(b => b.Title).ToList()
                 })
@@ -34,9 +33,8 @@ namespace Gadelshin_Lab1.Managers
                 .Select(a => new
                 {
                     Id = a.Id,
-                    Title = a.Name,
-                    Genre = a.Biography,
-                    PublishedYear = a.DateOfBirth,
+                    Name = a.Name,
+                    DateOfBirth = a.DateOfBirth,
                     Biography = a.Biography,
                     Books = a.Books.Select(b => b.Title).ToList()
                 }

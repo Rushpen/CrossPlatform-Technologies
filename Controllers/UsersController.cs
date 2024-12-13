@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using Gadelshin_Lab1.Data;
 using Gadelshin_Lab1.Models;
 using Gadelshin_Lab1.Managers;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Gadelshin_Lab1.Controllers
 {
@@ -26,6 +27,7 @@ namespace Gadelshin_Lab1.Controllers
 
         // GET: api/Users
         [HttpGet]
+        [Authorize(Roles = "admin")]
         public async Task<ActionResult<IEnumerable<User>>> GetUser()
         {
             var user = await _userManager.GetUser();
@@ -34,6 +36,7 @@ namespace Gadelshin_Lab1.Controllers
 
         // GET: api/Users/5
         [HttpGet("{id}")]
+        [Authorize(Roles = "admin")]
         public async Task<ActionResult<User>> GetUser(int id)
         {
             var user = await _userManager.GetUser(id);
@@ -44,6 +47,7 @@ namespace Gadelshin_Lab1.Controllers
 
         // GET: /api/users/{id}/borrowed-books
         [HttpGet("{id}/borrowed-books")]
+        [Authorize]
         public async Task<IActionResult> GetBorrowedBooks(int id)
         {
             var user = await _userManager.GetBorrowedBooks(id);
@@ -54,10 +58,12 @@ namespace Gadelshin_Lab1.Controllers
 
         // PUT: api/Users/5
         [HttpPut("{id}")]
+        [Authorize(Roles = "admin")]
         public async Task<IActionResult> UpdateUser(int id, User user)
         {
             try
             {
+                user.Id = id;
                 await _userManager.UpdateUser(id, user);
                 return Ok($"User with ID {id} was updated");
             }
@@ -69,6 +75,7 @@ namespace Gadelshin_Lab1.Controllers
 
         // POST: api/Users/{id}/add-books
         [HttpPost("{id}/add-books")]
+        [Authorize(Roles = "admin")]
         public async Task<IActionResult> AddUserBooks(int id, [FromBody] List<int> bookIds)
         {
             try
@@ -85,6 +92,7 @@ namespace Gadelshin_Lab1.Controllers
 
         // PUT: api/Users/{id}/update-books
         [HttpPut("{id}/update-books")]
+        [Authorize(Roles = "admin")]
         public async Task<IActionResult> UpdateUserBooks(int id, [FromBody] List<int> bookIds)
         {
             try
@@ -100,6 +108,7 @@ namespace Gadelshin_Lab1.Controllers
 
         // POST: api/Users
         [HttpPost]
+        [Authorize(Roles = "admin")]
         public async Task<ActionResult<User>> AddUser([FromBody] User user)
         {
             try
@@ -114,6 +123,7 @@ namespace Gadelshin_Lab1.Controllers
 
         // DELETE: api/Users/5
         [HttpDelete("{id}")]
+        [Authorize(Roles = "admin")]
         public async Task<IActionResult> DeleteUser(int id)
         {
             try

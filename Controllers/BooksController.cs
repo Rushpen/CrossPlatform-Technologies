@@ -100,6 +100,7 @@ namespace Gadelshin_Lab1.Controllers
         {
             try
             {
+                book.Id = id;
                 await _bookManager.UpdateBook(id, book);
                 return Ok($"Book with ID {id} was updated");
             }
