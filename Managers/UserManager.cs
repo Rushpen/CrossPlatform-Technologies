@@ -60,6 +60,49 @@ namespace Gadelshin_Lab1.Managers
                 ).ToListAsync<object>();
         }
 
+        public async Task<object> GetUserWithMostBooks()
+        {
+            var userWithMostBooks = await _context.User
+                .Where(u => u.BorrowedBooks.Any())
+                .OrderByDescending(u => u.BorrowedBooks.Count)
+                .Select(u => new
+                {
+                    Id = u.Id,
+                    Login = u.Login,
+                    Role = u.Role,
+                    BookCount = u.BorrowedBooks.Count,
+                    Books = u.BorrowedBooks.Select(b => b.Title).ToList()
+                })
+                .ToListAsync();
+
+            if (userWithMostBooks == null)
+                throw new Exception("No users found.");
+
+            return userWithMostBooks;
+        }
+
+        public async Task<object> GetUserWithoutBooks()
+        {
+            var userWithoutBooks = await _context.User
+           .Where(u => !u.BorrowedBooks.Any())
+           .OrderBy(u => u.Id)
+           .Select(u => new
+           {
+               Id = u.Id,
+               Login = u.Login,
+               Role = u.Role,
+               BookCount = 0,
+               Books = new List<string>()
+           })
+           .ToListAsync();
+
+            if (userWithoutBooks == null)
+                throw new Exception("No users without books found.");
+
+            return userWithoutBooks;
+        }
+
+
         public async Task UpdateUser(int id, User user)
         {
             if (id != user.Id)

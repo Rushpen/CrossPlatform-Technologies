@@ -56,6 +56,39 @@ namespace Gadelshin_Lab1.Controllers
             return Ok(user);
         }
 
+        // GET: api/Users/most-books
+        [HttpGet("most-books")]
+        [Authorize(Roles = "admin")]
+        public async Task<IActionResult> GetUserWithMostBooks()
+        {
+            try
+            {
+                var user = await _userManager.GetUserWithMostBooks();
+                return Ok(user);
+            }
+            catch (Exception e)
+            {
+                return BadRequest(e.Message);
+            }
+        }
+
+        // GET: api/Users/no-books
+        [HttpGet("no-books")]
+        [Authorize(Roles = "admin")]
+        public async Task<IActionResult> GetUserWithoutBooks()
+        {
+            try
+            {
+                var user = await _userManager.GetUserWithoutBooks();
+                return Ok(user);
+            }
+            catch (Exception e)
+            {
+                return BadRequest(e.Message);
+            }
+        }
+
+
         // PUT: api/Users/5
         [HttpPut("{id}")]
         [Authorize(Roles = "admin")]
@@ -92,7 +125,7 @@ namespace Gadelshin_Lab1.Controllers
 
         // PUT: api/Users/{id}/update-books
         [HttpPut("{id}/update-books")]
-        [Authorize(Roles = "admin")]
+        [Authorize]
         public async Task<IActionResult> UpdateUserBooks(int id, [FromBody] List<int> bookIds)
         {
             try

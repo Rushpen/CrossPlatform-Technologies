@@ -10,6 +10,7 @@ using Gadelshin_Lab1.Models;
 using Gadelshin_Lab1.Managers;
 using Humanizer.Localisation;
 using static System.Reflection.Metadata.BlobBuilder;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Gadelshin_Lab1.Controllers
 {
@@ -47,6 +48,7 @@ namespace Gadelshin_Lab1.Controllers
         }
 
         // GET: api/Authors/{id}/details
+        [Authorize]
         [HttpGet("{id}/details")]
         public async Task<IActionResult> GetAuthorDetails(int id)
         {
@@ -59,6 +61,7 @@ namespace Gadelshin_Lab1.Controllers
         }
 
         // POST: api/Authors
+        [Authorize(Roles = "admin")]
         [HttpPost]
         public async Task<ActionResult<Author>> PostAuthor(Author author)
         {
@@ -67,6 +70,7 @@ namespace Gadelshin_Lab1.Controllers
         }
 
         // POST: api/Authors/id/add-book
+        [Authorize(Roles = "admin")]
         [HttpPost("{id}/add-books")]
         public async Task<IActionResult> AddAuthorsToBook(int id, [FromBody] List<int> bookIds)
         {
@@ -82,6 +86,7 @@ namespace Gadelshin_Lab1.Controllers
         }
 
         // PUT: api/Authors/5
+        [Authorize(Roles = "admin")]
         [HttpPut("{id}")]
         public async Task<IActionResult> PutAuthor(int id, Author author)
         {
@@ -98,6 +103,7 @@ namespace Gadelshin_Lab1.Controllers
         }
 
         // PUT: api/Authors/id/update-book
+        [Authorize(Roles = "admin")]
         [HttpPut("{id}/update-books")]
         public async Task<IActionResult> PutAuthorsToBook(int id, [FromBody] List<int> bookIds)
         {
@@ -113,6 +119,7 @@ namespace Gadelshin_Lab1.Controllers
         }
 
         // DELETE: api/Authors/5
+        [Authorize(Roles = "admin")]
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteAuthor(int id)
         {

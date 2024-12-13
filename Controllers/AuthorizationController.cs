@@ -21,10 +21,11 @@ namespace Gadelshin_Lab1.Controllers
         {
             if (model == null || string.IsNullOrEmpty(model.Login) || string.IsNullOrEmpty(model.Password))
                 return BadRequest("Invalid username or password.");
-            bool isValidUser = model.Login == "admin" && model.Password == "admin123";
-            bool isAdmin = model.Login == "admin";
 
-            if (!isValidUser)
+            bool isAdmin = model.Login == "admin" && model.Password == "admin123";
+            bool isUser = model.Login != "admin" && !string.IsNullOrEmpty(model.Password);
+
+            if (!isAdmin && !isUser)
                 return Unauthorized("Invalid credentials.");
 
             var token = _authorization.GenerateToken(model.Login, isAdmin);
