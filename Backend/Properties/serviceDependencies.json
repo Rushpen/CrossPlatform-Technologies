@@ -5,7 +5,8 @@
     },
     "postgresql1": {
       "type": "postgresql",
-      "connectionId": "postgresql"
+      "connectionId": "postgresql",
+      "dynamicId": null
     }
   }
 }
