@@ -26,8 +26,7 @@ body {
   }
   
   .nav-list li {
-    margin: 0; 
-    padding: 0; 
+    position: relative;
   }
   
   .nav-list a {
@@ -42,3 +41,34 @@ body {
     color: #021d3a;
   }
   
+.dropdown-content {
+  display: none; 
+  position: absolute;
+  top: 100%;
+  width: 100%;
+  background-color: #b7f0f7;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  border-radius: 5px;
+  border-color: #00000065;
+  padding: 10px;
+  z-index: 10;
+}
+
+.dropdown-item:hover {
+  background-color: #008a99;
+  color: #021d3a;
+  border-radius: 3px;
+  padding: 0 40%;
+}
+
+.dropdown-content label {
+  display: block;
+  margin: 5px 0;
+  font-size: 18px;
+  justify-self: center;
+  color: #333;
+}
+
+.dropdown:hover .dropdown-content {
+  display: block;
+}

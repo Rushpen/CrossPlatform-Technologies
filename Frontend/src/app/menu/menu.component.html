@@ -1,8 +1,15 @@
 <nav>
-    <ul class="nav-list">
-      <li><a href ="/">Home</a></li>
-      <li><a routerLink="/add">Add something</a></li>
-      <li><a href="/api/Books" target="_blank">View something</a></li>
-      <li><a routerLink="/view">Another one</a></li>
-    </ul>
-  </nav>
+  <ul class="nav-list">
+    <li><a href="/">Home</a></li>
+    <li><a routerLink="/add">Add something</a></li>
+    <li class="dropdown">
+      <a routerLink="/api/Books">View something</a>
+      <div class="dropdown-content">
+        <label class="dropdown-item">Books</label>
+        <label class="dropdown-item">Authors</label>
+        <label class="dropdown-item">Users</label>
+      </div>
+    </li>
+    <li><a routerLink="/view">Another one</a></li>
+  </ul>
+</nav>
