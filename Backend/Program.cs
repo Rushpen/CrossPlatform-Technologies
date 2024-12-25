@@ -20,14 +20,13 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             ValidateAudience = true,
             ValidateLifetime = true,
             ValidateIssuerSigningKey = true,
-            ValidIssuer = "MyAuthServer", // Установите свой Issuer
-            ValidAudience = "MyAuthClient", // Установите свой Audience
+            ValidIssuer = "MyAuthServer", // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ Issuer
+            ValidAudience = "MyAuthClient", // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ Audience
             IssuerSigningKey = Authorization.GetSymmetricSecurityKey()
         };
     });
 
 // Add services to the container.
-
 builder.Services.AddAuthorization(options =>
 {
     options.AddPolicy("AdminPolicy", policy => policy.RequireRole("admin"));

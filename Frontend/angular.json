@@ -67,7 +67,8 @@
               "buildTarget": "Lab2Frontend:build:production"
             },
             "development": {
-              "buildTarget": "Lab2Frontend:build:development"
+              "buildTarget": "Lab2Frontend:build:development",
+              "proxyConfig": "../proxy.conf.json"
             }
           },
           "defaultConfiguration": "development"

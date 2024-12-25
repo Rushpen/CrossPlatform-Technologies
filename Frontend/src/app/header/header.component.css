@@ -1,0 +1,39 @@
+.logo {
+    max-width: 50px;
+    height: auto;
+    margin-right: 20px;
+  }
+  
+  header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+    background-color: #f8f9fa;
+  }
+  
+  .logo-title {
+    display: flex;
+    align-items: center;
+  }
+  
+  .buttonEntry {
+    padding: 5px 20px;
+    font-size: 16px; 
+    line-height: 1.5;
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  
+  .buttonEntry:hover {
+    background-color: #0056b3;
+  }
+
+  .buttonEntry:active {
+    transform: scale(0.99);
+  }
+
+  
