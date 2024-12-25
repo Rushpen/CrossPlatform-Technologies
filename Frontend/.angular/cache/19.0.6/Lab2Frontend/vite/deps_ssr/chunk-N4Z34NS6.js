@@ -9,7 +9,7 @@ import {
   isPlatformServer,
   parseCookieValue,
   setRootDomAdapter
-} from "./chunk-QWJBPVFH.js";
+} from "./chunk-KGFTXC6C.js";
 import {
   APP_BOOTSTRAP_LISTENER,
   APP_ID,
@@ -4248,6 +4248,7 @@ function provideClientHydration(...features) {
 var VERSION = new Version("19.0.5");
 
 export {
+  HttpClient,
   HTTP_ROOT_INTERCEPTOR_FNS,
   BrowserDomAdapter,
   BrowserGetTestability,
@@ -4303,4 +4304,4 @@ export {
    * License: MIT
    *)
 */
-//# sourceMappingURL=chunk-YAROXXR3.js.map
+//# sourceMappingURL=chunk-N4Z34NS6.js.map

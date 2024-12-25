@@ -1,0 +1,15 @@
+
+footer {
+    margin-top: auto;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #f0f0f0;
+    padding: 10px;
+    gap: 20px;
+  }
+  
+  footer p, footer a {
+    margin: 0;
+  }
+  

@@ -1,3 +1,4 @@
+import { createRequire } from 'module';const require = createRequire(import.meta.url);
 import {
   ApplicationRef,
   Attribute,
@@ -26,13 +27,9 @@ import {
   Renderer2,
   RendererStyleFlags2,
   RuntimeError,
-  Subject,
   TemplateRef,
   Version,
   ViewContainerRef,
-  __async,
-  __spreadProps,
-  __spreadValues,
   booleanAttribute,
   createNgModule,
   findLocaleData,
@@ -43,6 +40,7 @@ import {
   isSubscribable,
   numberAttribute,
   performanceMarkFeature,
+  require_cjs,
   setClassMetadata,
   stringify,
   untracked,
@@ -58,9 +56,16 @@ import {
   ɵɵinject,
   ɵɵinjectAttribute,
   ɵɵstyleProp
-} from "./chunk-Z3GLR2YK.js";
+} from "./chunk-PEAVEDUD.js";
+import {
+  __async,
+  __spreadProps,
+  __spreadValues,
+  __toESM
+} from "./chunk-YHCV7DAQ.js";
 
 // node_modules/@angular/common/fesm2022/common.mjs
+var import_rxjs = __toESM(require_cjs(), 1);
 var _DOM = null;
 function getDOM() {
   return _DOM;
@@ -407,7 +412,7 @@ var HashLocationStrategy = class _HashLocationStrategy extends LocationStrategy 
 })();
 var Location = class _Location {
   /** @internal */
-  _subject = new Subject();
+  _subject = new import_rxjs.Subject();
   /** @internal */
   _basePath;
   /** @internal */
@@ -4951,16 +4956,22 @@ export {
   setRootDomAdapter,
   DomAdapter,
   DOCUMENT,
+  PlatformLocation,
   LOCATION_INITIALIZED,
   LocationStrategy,
+  APP_BASE_HREF,
   PathLocationStrategy,
   HashLocationStrategy,
   Location,
   parseCookieValue,
+  NgTemplateOutlet,
   CommonModule,
   PLATFORM_BROWSER_ID,
+  PLATFORM_SERVER_ID,
+  isPlatformBrowser,
   isPlatformServer,
   ViewportScroller,
+  NullViewportScroller,
   XhrFactory
 };
 /*! Bundled license information:
@@ -4972,4 +4983,4 @@ export {
    * License: MIT
    *)
 */
-//# sourceMappingURL=chunk-RTARJ4QS.js.map
+//# sourceMappingURL=chunk-KGFTXC6C.js.map
