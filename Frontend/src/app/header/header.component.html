@@ -1,9 +1,10 @@
 <header>
-    <div class="logo-title">
-      <img src="books.svg" alt="App Logo" class="logo">
-      <h1>{{ title }}</h1>
-    </div>
-    <button class="buttonEntry" mat-button (click)="openAuthDialog()">Authorization</button>
-  </header>
-
-  
+  <div class="logo-title">
+    <img src="books.svg" alt="App Logo" class="logo">
+    <h1>{{ title }}</h1>
+  </div>
+  <div class="user-role">
+    {{ userRole ? 'Вы вошли как: ' + userRole : 'Вы не авторизованы' }}
+  </div>
+  <button class="buttonEntry" mat-button (click)="openAuthDialog()">Authorization</button>
+</header>

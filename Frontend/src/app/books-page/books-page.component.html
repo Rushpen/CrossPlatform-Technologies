@@ -1,0 +1,9 @@
+<p *ngIf="isLoading">Загрузка...</p>
+<div *ngIf="!isLoading">
+  <h1>Книги</h1>
+  <ul>
+    <li *ngFor="let book of books">
+      {{ book.title }} - {{ book.author }}
+    </li>
+  </ul>
+</div>

@@ -27,7 +27,7 @@ namespace Gadelshin_Lab1.Controllers
 
         // GET: api/Users
         [HttpGet]
-        [Authorize(Roles = "admin")]
+        // [Authorize(Roles = "admin")]
         public async Task<ActionResult<IEnumerable<User>>> GetUser()
         {
             var user = await _userManager.GetUser();
@@ -36,10 +36,21 @@ namespace Gadelshin_Lab1.Controllers
 
         // GET: api/Users/5
         [HttpGet("{id}")]
-        [Authorize(Roles = "admin")]
+        //[Authorize(Roles = "admin")]
         public async Task<ActionResult<User>> GetUser(int id)
         {
             var user = await _userManager.GetUser(id);
+            if (user == null)
+                return NotFound();
+            return Ok(user);
+        }
+
+        // GET: api/Users/username
+        [HttpGet("{login}")]
+        //[Authorize(Roles = "admin")]
+        public async Task<ActionResult<User>> GetUser(string login)
+        {
+            var user = await _userManager.GetUserByLogin(login);
             if (user == null)
                 return NotFound();
             return Ok(user);

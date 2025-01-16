@@ -29,7 +29,7 @@ namespace Gadelshin_Lab1.Controllers
                 return Unauthorized("Invalid credentials.");
 
             var token = _authorization.GenerateToken(model.Login, isAdmin);
-            return Ok(new { Token = token });
+            return Ok(new { Token = token, Role = isAdmin ? "admin" : "user" });
         }
         public class LoginModel
         {

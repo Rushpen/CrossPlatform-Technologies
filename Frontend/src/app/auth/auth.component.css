@@ -54,16 +54,40 @@
   }
 
   h2 {
-    align-self: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;     
+    position: relative;      
+    padding-right: 30px;     
+    font-size: 1.5em;    
+  }
+
+  .title {
+    flex-grow: 1;
+    text-align: center;
   }
 
   .close-button {
     position: absolute;
-    top: 0;
-    right:0;
+    top: 5px; /* Отступ от верхнего края */
+    right: 5px; /* Отступ от правого края */
     height: auto;
     width: auto;
-    margin: 5px;
-    color: #ff0000; /* Цвет иконки, можно менять */
+    color: #ff0000; /* Цвет иконки */
+    background: none; /* Убираем фон, если нужен прозрачный фон */
+    border: none; /* Убираем границу */
+    cursor: pointer; /* Указатель при наведении */
   }
+  
+  /* Подсветка формы в случае ошибки */
+.error {
+  border: 2px solid red;
+}
+
+/* Сообщение об ошибке */
+.error-message {
+  color: red;
+  font-weight: bold;
+  margin-top: 10px;
+}
   

@@ -1,13 +1,13 @@
 <nav>
   <ul class="nav-list">
-    <li><a href="/">Home</a></li>
+    <li><a routerLink="/">Home</a></li>
     <li><a routerLink="/add">Add something</a></li>
     <li class="dropdown">
-      <a routerLink="/api/Books">View something</a>
+      <a>View something</a>
       <div class="dropdown-content">
-        <label class="dropdown-item">Books</label>
-        <label class="dropdown-item">Authors</label>
-        <label class="dropdown-item">Users</label>
+        <a routerLink="/api/Books" class="dropdown-item">Books</a>
+        <a routerLink="/api/Authors" class="dropdown-item">Authors</a>
+        <a routerLink="/api/Users" class="dropdown-item">Users</a>
       </div>
     </li>
     <li><a routerLink="/view">Another one</a></li>

@@ -46,6 +46,21 @@ namespace Gadelshin_Lab1.Managers
                 .ToListAsync<object>();
         }
 
+        public async Task<List<object>> GetUserByLogin(string login)
+        {
+            return await _context.User
+                .Where(u => u.Login == login)
+                .Select(u => new
+                {
+                    Id = u.Id,
+                    Login = u.Login,
+                    Role = u.Role,
+                    Books = u.BorrowedBooks.Select(b => b.Title).ToList()
+                }
+                )
+                .ToListAsync<object>();
+        }
+
         public async Task<List<object>> GetBorrowedBooks(int id)
         {
             return await _context.User
