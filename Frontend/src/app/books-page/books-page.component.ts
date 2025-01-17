@@ -1,28 +1,30 @@
-import { Component, OnInit } from '@angular/core';
-import { HttpClient, HttpClientModule } from '@angular/common/http'; // Импортируем HttpClient для запросов
+import { Component } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { HttpClientModule, HttpClient } from '@angular/common/http';
 
 @Component({
   selector: 'app-books-page',
+  standalone: true,
+  imports: [CommonModule, HttpClientModule], // Подключаем HttpClientModule
   templateUrl: './books-page.component.html',
   styleUrls: ['./books-page.component.css']
 })
-export class BooksPageComponent implements OnInit {
+export class BooksPageComponent {
+  books: any[] = [];
+  isLoading: boolean = true;
 
-  books: any[] = [];  // Массив для хранения книг
-  isLoading: boolean = true;  // Флаг загрузки данных
-
-  constructor(private http: HttpClient) { }  // Внедряем HttpClient
+  constructor(private http: HttpClient) {}
 
   ngOnInit(): void {
-    // Запрашиваем данные с API при инициализации компонента
     this.http.get<any[]>('/api/Books').subscribe(
       (data) => {
-        this.books = data;  // Сохраняем полученные данные
-        this.isLoading = false;  // Останавливаем индикатор загрузки
+        console.log('Полученные данные:', data);
+        this.books = data;
+        this.isLoading = false;
       },
       (error) => {
-        console.error('Error fetching books:', error);
-        this.isLoading = false;  // Останавливаем индикатор загрузки в случае ошибки
+        console.error('Ошибка при загрузке данных:', error);
+        this.isLoading = false;
       }
     );
   }

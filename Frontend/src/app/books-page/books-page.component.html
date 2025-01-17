@@ -1,9 +1,24 @@
-<p *ngIf="isLoading">Загрузка...</p>
-<div *ngIf="!isLoading">
-  <h1>Книги</h1>
-  <ul>
-    <li *ngFor="let book of books">
-      {{ book.title }} - {{ book.author }}
-    </li>
-  </ul>
+<div style="display: flex; justify-content: center; align-items: center; padding: 20px;">
+  <table border="2" style="border-collapse: collapse; width: 80%; max-width: 800px; text-align: center;">
+    <thead>
+      <tr>
+        <th style="padding: 8px;">ID</th>
+        <th style="padding: 8px;">Название</th>
+        <th style="padding: 8px;">Жанр</th>
+        <th style="padding: 8px;">Год публикации</th>
+        <th style="padding: 8px;">Авторы</th>
+        <th style="padding: 8px;">Занята</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let book of books">
+        <td style="padding: 8px;">{{ book.id }}</td>
+        <td style="padding: 8px;">{{ book.title }}</td>
+        <td style="padding: 8px;">{{ book.genre }}</td>
+        <td style="padding: 8px;">{{ book.publishedYear }}</td>
+        <td style="padding: 8px;">{{ book.authors?.join(', ') || 'Без автора' }}</td>
+        <td style="padding: 8px;">{{ book.isBorrow == 'Yes' ? 'Да' : 'Нет' }}</td>
+      </tr>
+    </tbody>
+  </table>
 </div>

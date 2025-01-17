@@ -22,7 +22,7 @@ namespace Gadelshin_Lab1.Managers
                     Genre = b.Genre,
                     PublishedYear = b.PublishedYear,
                     Authors = b.Authors.Select(b => b.Name).ToList(),
-                    isBorrow = b.User != null ? "Yes" : "No"
+                    isBorrow = b.IsBorrowed
                 }
                 )
                 .ToListAsync<object>();
@@ -51,7 +51,7 @@ namespace Gadelshin_Lab1.Managers
                 Genre = b.Genre,
                 PublishedYear = b.PublishedYear,
                 Authors = b.Authors.Select(a => a.Name).ToList(),
-                isBorrow = b.User != null ? "Yes" : "No"
+                isBorrow = b.IsBorrowed
             }).ToList<dynamic>();
 
             if (!result.Any())

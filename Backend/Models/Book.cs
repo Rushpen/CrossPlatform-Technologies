@@ -14,6 +14,8 @@ namespace Gadelshin_Lab1.Models
         [JsonIgnore]
         public User? User { get; set; }
 
+        public string IsBorrowed => UserId.HasValue ? "Да" : "Нет";
+
         public enum BookType { Modern, Classic, Other}
 
         // Methods
